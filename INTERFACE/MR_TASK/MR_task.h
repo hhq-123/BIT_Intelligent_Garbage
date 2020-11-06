@@ -7,6 +7,7 @@
 
 #include "FreeRTOS.h"
 #include "task.h"
+#include "queue.h"
 
 #include "key.h"
 #include "led.h"
@@ -15,6 +16,9 @@
 
 #include "ov2640.h" 
 #include "dcmi.h" 
+
+#include "sys_eth.h"
+#include "tcp_client.h"
 
 #include "MR_CV.h"
 

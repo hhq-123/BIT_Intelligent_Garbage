@@ -4,6 +4,14 @@
 extern const u8*EFFECTS_TBL[7];
 extern const u8*JPEG_SIZE_TBL[9]; 
 
+// TCP客户端接收数据结构
+#pragma pack(push, 1)
+typedef struct _sTcpClientRxMsg
+{
+   unsigned char *pbuf;
+   unsigned int length;
+}sTcpClientRxMsg_t;
+#pragma pack(pop)
 
 void MR_start(void)
 {
@@ -42,16 +50,17 @@ void start_task(void *pvParameters)
 {
     taskENTER_CRITICAL();           //进入临界区
     //创建TASK1任务
-    xTaskCreate((TaskFunction_t )rgb565_test_task,             
-                (const char*    )"task1_task",           
-                (uint16_t       )RGB565_TEST_STK_SIZE,        
+    xTaskCreate((TaskFunction_t )tcp_client_task,             
+                (const char*    )"tcp_client_task",           
+                (uint16_t       )TCP_CLIENT_STK_SIZE,        
                 (void*          )NULL,                  
-                (UBaseType_t    )RGB565_TEST_TASK_PRIO,        
-                (TaskHandle_t*  )&Rgb565TestTask_Handler);   
+                (UBaseType_t    )TCP_CLIENT_TASK_PRIO,        
+                (TaskHandle_t*  )&TcpClientTask_Handler);   
 
     vTaskDelete(StartTask_Handler); //删除开始任务
     taskEXIT_CRITICAL();            //退出临界区
 }
+
 
 /*
 //task1任务函数
@@ -174,3 +183,47 @@ void rgb565_test_task(void *pvParameters)
 	}    
 }
 
+
+
+void tcp_client_task(void *pvParameters)
+{
+	u8 buf[30]; 
+   sLwipDev_t sLwipDev = {0};
+   sTcpClientRxMsg_t msg = {0};
+ 
+   // 以太网、LwIP协议栈初始化
+   LCD_ShowString(30,30,200,16,16,"lwIP Initing...");
+	 eth_default_ip_get(&sLwipDev);
+   
+	while(eth_init(&sLwipDev) != 0)
+  {
+    LCD_ShowString(30,50,200,16,16,"lwIP Init failed!");
+		vTaskDelay(500);
+		LCD_Fill(30,50,230,110+16,WHITE);//清除显示
+		LCD_ShowString(30,50,200,16,16,"Retrying...");  		 
+  }
+	LCD_ShowString(30,50,200,16,16,"lwIP Init Successed");
+  tcp_client_init(&sLwipDev);
+	
+	sprintf((char*)buf,"mask:%d.%d.%d.%d",sLwipDev.mask[0],sLwipDev.mask[1],sLwipDev.mask[2],sLwipDev.mask[3]);
+	LCD_ShowString(30,70,210,16,16,buf);
+	sprintf((char*)buf,"gateway:%d.%d.%d.%d",sLwipDev.gateway[0],sLwipDev.gateway[1],sLwipDev.gateway[2],sLwipDev.gateway[3]);
+	LCD_ShowString(30,90,210,16,16,buf); 
+	sprintf((char*)buf,"local IP:%d.%d.%d.%d",sLwipDev.localip[0],sLwipDev.localip[1],sLwipDev.localip[2],sLwipDev.localip[3]);
+	LCD_ShowString(30,110,210,16,16,buf); 
+	sprintf((char*)buf,"remote IP:%d.%d.%d.%d",sLwipDev.remoteip[0],sLwipDev.remoteip[1],sLwipDev.remoteip[2],sLwipDev.remoteip[3]);
+	LCD_ShowString(30,130,210,16,16,buf); 	
+	sprintf((char*)buf,"localport:%d",sLwipDev.localport);
+	LCD_ShowString(30,150,210,16,16,buf); 		LCD_ShowString(30,130,210,16,16,buf); 	
+	sprintf((char*)buf,"remoteport:%d",sLwipDev.remoteport);
+	LCD_ShowString(30,170,210,16,16,buf); 	
+  
+	while(1)
+	{
+		if(xQueueReceive(tcp_client_queue(), &msg, portMAX_DELAY) == pdPASS)
+    {
+			tcp_client_write(msg.pbuf, msg.length);
+			vPortFree(msg.pbuf);
+    }
+  }
+}

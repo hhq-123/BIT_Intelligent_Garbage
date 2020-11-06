@@ -5,6 +5,8 @@
 #include "timer.h"
 
 #include "MR_task.h"
+
+
 /************************************************
  ALIENTEK 探索者STM32F407开发板 FreeRTOS实验6-1
  FreeRTOS任务创建和删除(动态方法)-库函数版本
@@ -25,14 +27,14 @@ int main(void)
 	LED_Init();		        			//初始化LED端口
 	LCD_Init();							//初始化LCD
  	KEY_Init();					//按键初始化 
-	
+	/*
 	POINT_COLOR = RED;
 	LCD_ShowString(30,10,200,16,16,"ATK STM32F103/F407");	
 	LCD_ShowString(30,30,200,16,16,"FreeRTOS Examp 6-1");
 	LCD_ShowString(30,50,200,16,16,"Task Creat and Del");
 	LCD_ShowString(30,70,200,16,16,"ATOM@ALIENTEK");
 	LCD_ShowString(30,90,200,16,16,"2016/11/25");
-	
+	*/
 	MR_start();
 }
 

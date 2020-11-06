@@ -48,5 +48,13 @@ TaskHandle_t Rgb565TestTask_Handler;
 //任务函数
 void rgb565_test_task(void *pvParameters);
 
+//任务优先级
+#define TCP_CLIENT_TASK_PRIO		2
+//任务堆栈大小	
+#define TCP_CLIENT_STK_SIZE 		128  
+//任务句柄
+TaskHandle_t TcpClientTask_Handler;
+//任务函数
+void tcp_client_task(void *pvParameters);
 
 #endif
