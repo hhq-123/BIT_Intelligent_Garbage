@@ -845,8 +845,6 @@ tcp_send_empty_ack(struct tcp_pcb *pcb)
   struct tcp_hdr *tcphdr;
   u8_t optlen = 0;
 
-	tcphdr = tcphdr;
-	
 #if LWIP_TCP_TIMESTAMPS
   if (pcb->flags & TF_TIMESTAMP) {
     optlen = LWIP_TCP_OPT_LENGTH(TF_SEG_OPTS_TS);
@@ -1367,9 +1365,7 @@ tcp_keepalive(struct tcp_pcb *pcb)
 {
   struct pbuf *p;
   struct tcp_hdr *tcphdr;
-	
-	tcphdr = tcphdr;
-	
+
   LWIP_DEBUGF(TCP_DEBUG, ("tcp_keepalive: sending KEEPALIVE probe to %"U16_F".%"U16_F".%"U16_F".%"U16_F"\n",
                           ip4_addr1_16(&pcb->remote_ip), ip4_addr2_16(&pcb->remote_ip),
                           ip4_addr3_16(&pcb->remote_ip), ip4_addr4_16(&pcb->remote_ip)));

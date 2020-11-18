@@ -1,6 +1,5 @@
 ..\obj\malloc.o: ..\MALLOC\malloc.c
 ..\obj\malloc.o: ..\MALLOC\malloc.h
-..\obj\malloc.o: ..\SYSTEM\sys\sys.h
 ..\obj\malloc.o: ..\USER\stm32f4xx.h
 ..\obj\malloc.o: ..\CORE\core_cm4.h
 ..\obj\malloc.o: D:\Program Files\IDE\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h

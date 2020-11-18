@@ -33,17 +33,18 @@ void DCMI_IRQHandler(void)
 	}
 } 
 //DCMI DMA配置
-//DMA_Memory0BaseAddr:存储器地址    将要存储摄像头数据的内存地址(也可以是外设地址)
+//memaddr:存储器地址    将要存储摄像头数据的内存地址(也可以是外设地址)
 //DMA_BufferSize:存储器长度    0~65535
-//DMA_MemoryDataSize:存储器位宽  
 //DMA_MemoryDataSize:存储器位宽    @defgroup DMA_memory_data_size :DMA_MemoryDataSize_Byte/DMA_MemoryDataSize_HalfWord/DMA_MemoryDataSize_Word
 //DMA_MemoryInc:存储器增长方式  @defgroup DMA_memory_incremented_mode  /** @defgroup DMA_memory_incremented_mode : DMA_MemoryInc_Enable/DMA_MemoryInc_Disable
-void DCMI_DMA_Init(u32 DMA_Memory0BaseAddr,u16 DMA_BufferSize,u32 DMA_MemoryDataSize,u32 DMA_MemoryInc)
+ 
+void DCMI_DMA_Init(u32 DMA_Memory0BaseAddr,u32 DMA_Memory1BaseAddr,u16 DMA_BufferSize,u32 DMA_MemoryDataSize,u32 DMA_MemoryInc)
 { 
 	DMA_InitTypeDef  DMA_InitStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
 	
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2,ENABLE);//DMA2时钟使能 
-	DMA_DeInit(DMA2_Stream1);
+	DMA_DeInit(DMA2_Stream1);//等待DMA2_Stream1
 	while (DMA_GetCmdStatus(DMA2_Stream1) != DISABLE){}//等待DMA2_Stream1可配置 
 	
   /* 配置 DMA Stream */
@@ -63,8 +64,34 @@ void DCMI_DMA_Init(u32 DMA_Memory0BaseAddr,u16 DMA_BufferSize,u32 DMA_MemoryData
   DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;//外设突发单次传输
   DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;//存储器突发单次传输
   DMA_Init(DMA2_Stream1, &DMA_InitStructure);//初始化DMA Stream
+		
+	if(DMA_Memory1BaseAddr)
+  {
+		DMA_DoubleBufferModeCmd(DMA2_Stream1,ENABLE);//双缓冲模式
+	  DMA_MemoryTargetConfig(DMA2_Stream1,DMA_Memory1BaseAddr,DMA_Memory_1);//配置目标地址1
+		DMA_ITConfig(DMA2_Stream1,DMA_IT_TC,ENABLE);//开启传输完成中断
+		
+		NVIC_InitStructure.NVIC_IRQChannel = DMA2_Stream1_IRQn;
+		NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;//抢占优先级0
+		NVIC_InitStructure.NVIC_IRQChannelSubPriority =0;		//子优先级0
+		NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;			//IRQ通道使能
+		NVIC_Init(&NVIC_InitStructure);	//根据指定的参数初始化VIC寄存器、
+	}
+		
 	
 } 
+
+void (*dcmi_rx_callback)(void);//DCMI DMA接收回调函数
+//DMA2_Stream1中断服务函数(仅双缓冲模式会用到)
+void DMA2_Stream1_IRQHandler(void)
+{        
+	if(DMA_GetFlagStatus(DMA2_Stream1,DMA_FLAG_TCIF1)==SET)//DMA2_Steam1,传输完成标志
+	{  
+		 DMA_ClearFlag(DMA2_Stream1,DMA_FLAG_TCIF1);//清除传输完成中断
+     dcmi_rx_callback();	//执行摄像头接收回调函数,读取数据等操作在这里面处理  
+	}    											 
+}  
+
 //DCMI初始化
 void My_DCMI_Init(void)
 {
@@ -73,8 +100,8 @@ void My_DCMI_Init(void)
 
 	
   RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOB|RCC_AHB1Periph_GPIOC|RCC_AHB1Periph_GPIOE, ENABLE);//使能GPIOA B C E 时钟
-	RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_DCMI,ENABLE);//使能DCMI时钟
-  //PA4/6初始化设置
+	RCC_AHB2PeriphClockCmd(RCC_AHB2Periph_DCMI,ENABLE);
+  //GPIOF9,F10初始化设置
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4|GPIO_Pin_6;//PA4/6   复用功能输出
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF; //复用功能输出
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;//推挽输出
@@ -82,7 +109,7 @@ void My_DCMI_Init(void)
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
   GPIO_Init(GPIOA, &GPIO_InitStructure);//初始化
 	
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7|GPIO_Pin_6;// PB6/7   复用功能输出
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7|GPIO_Pin_6;//PA4/6   //PB6/7   复用功能输出
   GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化
 	
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6|GPIO_Pin_7|GPIO_Pin_8|GPIO_Pin_9|GPIO_Pin_11;//PC6/7/8/9/11 复用功能输出

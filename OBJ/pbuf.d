@@ -61,7 +61,7 @@
 ..\obj\pbuf.o: ..\LWIP\lwip-1.4.1\src\include\lwip/def.h
 ..\obj\pbuf.o: ..\LWIP\lwip-1.4.1\src\include\lwip/pbuf.h
 ..\obj\pbuf.o: ..\LWIP\lwip-1.4.1\src\include\lwip/err.h
-..\obj\pbuf.o: ..\LWIP\lwip-1.4.1\src\include\lwip/sys.h
+..\obj\pbuf.o: ..\LWIP\lwip-1.4.1\src\include\lwip/lwip_sys.h
 ..\obj\pbuf.o: ..\LWIP\arch/sys_arch.h
 ..\obj\pbuf.o: ..\FreeRTOS\include\semphr.h
 ..\obj\pbuf.o: ..\FreeRTOS\include\queue.h

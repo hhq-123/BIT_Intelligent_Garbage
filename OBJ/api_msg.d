@@ -58,7 +58,7 @@
 ..\obj\api_msg.o: ..\LWIP\lwip-1.4.1\src\include\ipv4\lwip/ip_addr.h
 ..\obj\api_msg.o: ..\LWIP\lwip-1.4.1\src\include\lwip/def.h
 ..\obj\api_msg.o: ..\LWIP\lwip-1.4.1\src\include\lwip/err.h
-..\obj\api_msg.o: ..\LWIP\lwip-1.4.1\src\include\lwip/sys.h
+..\obj\api_msg.o: ..\LWIP\lwip-1.4.1\src\include\lwip/lwip_sys.h
 ..\obj\api_msg.o: ..\LWIP\arch/sys_arch.h
 ..\obj\api_msg.o: ..\FreeRTOS\include\semphr.h
 ..\obj\api_msg.o: ..\FreeRTOS\include\queue.h

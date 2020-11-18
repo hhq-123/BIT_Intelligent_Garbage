@@ -71,7 +71,7 @@
 ..\obj\memp.o: ..\LWIP\lwip-1.4.1\src\include\ipv4\lwip/igmp.h
 ..\obj\memp.o: ..\LWIP\lwip-1.4.1\src\include\lwip/api.h
 ..\obj\memp.o: ..\LWIP\lwip-1.4.1\src\include\lwip/netbuf.h
-..\obj\memp.o: ..\LWIP\lwip-1.4.1\src\include\lwip/sys.h
+..\obj\memp.o: ..\LWIP\lwip-1.4.1\src\include\lwip/lwip_sys.h
 ..\obj\memp.o: ..\LWIP\arch/sys_arch.h
 ..\obj\memp.o: ..\FreeRTOS\include\semphr.h
 ..\obj\memp.o: ..\FreeRTOS\include\queue.h

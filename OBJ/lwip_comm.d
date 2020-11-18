@@ -41,7 +41,7 @@
 ..\obj\lwip_comm.o: ..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\netif/etharp.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/opt.h
-..\obj\lwip_comm.o: ..\LWIP\lwip_app\lwip_comm\lwipopts.h
+..\obj\lwip_comm.o: ..\LWIP\arch\lwipopts.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/debug.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/arch.h
 ..\obj\lwip_comm.o: ..\LWIP\arch/cc.h
@@ -67,15 +67,18 @@
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\ipv4\lwip/ip.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/dhcp.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/udp.h
+..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/mem.h
+..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/memp.h
+..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/memp_std.h
+..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/init.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\netif\ethernetif.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/timers.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/lwip_sys.h
 ..\obj\lwip_comm.o: ..\LWIP\arch/sys_arch.h
-..\obj\lwip_comm.o: ..\FreeRTOS\include\queue.h
 ..\obj\lwip_comm.o: ..\FreeRTOS\include\semphr.h
+..\obj\lwip_comm.o: ..\FreeRTOS\include\queue.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/tcp_impl.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/tcp.h
-..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/mem.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\ipv4\lwip/icmp.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\ipv4\lwip/ip_frag.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/tcpip.h
@@ -84,3 +87,5 @@
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/api.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/netbuf.h
 ..\obj\lwip_comm.o: ..\LWIP\lwip-1.4.1\src\include\lwip/netifapi.h
+..\obj\lwip_comm.o: ..\MALLOC\malloc.h
+..\obj\lwip_comm.o: ..\SYSTEM\delay\delay.h

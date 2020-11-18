@@ -41,3 +41,12 @@
 ..\obj\lan8720.o: ..\SYSTEM\usart\usart.h
 ..\obj\lan8720.o: D:\Program Files\IDE\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\lan8720.o: ..\SYSTEM\delay\delay.h
+..\obj\lan8720.o: ..\MALLOC\malloc.h
+..\obj\lan8720.o: ..\FreeRTOS\include\FreeRTOS.h
+..\obj\lan8720.o: D:\Program Files\IDE\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+..\obj\lan8720.o: ..\FreeRTOS\include\FreeRTOSConfig.h
+..\obj\lan8720.o: ..\FreeRTOS\include\projdefs.h
+..\obj\lan8720.o: ..\FreeRTOS\include\portable.h
+..\obj\lan8720.o: ..\FreeRTOS\include\deprecated_definitions.h
+..\obj\lan8720.o: ..\FreeRTOS\portable\RVDS\ARM_CM4F\portmacro.h
+..\obj\lan8720.o: ..\FreeRTOS\include\mpu_wrappers.h

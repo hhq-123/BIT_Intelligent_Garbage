@@ -1,4 +1,6 @@
 ..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\netif\ethernetif.c
+..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\include\netif/ethernetif.h
+..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\include\lwip/err.h
 ..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\include\lwip/opt.h
 ..\obj\ethernetif.o: ..\LWIP\arch\lwipopts.h
 ..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\include\lwip/debug.h
@@ -54,3 +56,14 @@
 ..\obj\ethernetif.o: ..\FreeRTOS\include\task.h
 ..\obj\ethernetif.o: ..\FreeRTOS\include\list.h
 ..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\include\lwip/opt.h
+..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\include\lwip/netif.h
+..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\include\ipv4\lwip/ip_addr.h
+..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\include\lwip/def.h
+..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\include\lwip/pbuf.h
+..\obj\ethernetif.o: ..\HARDWARE\ETHERNET\lan8720.h
+..\obj\ethernetif.o: ..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth.h
+..\obj\ethernetif.o: ..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h
+..\obj\ethernetif.o: ..\LWIP\lwip_app\lwip_comm\lwip_comm.h
+..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\include\netif/etharp.h
+..\obj\ethernetif.o: ..\LWIP\lwip-1.4.1\src\include\ipv4\lwip/ip.h
+..\obj\ethernetif.o: D:\Program Files\IDE\Keil_v5\ARM\ARMCC\Bin\..\include\string.h

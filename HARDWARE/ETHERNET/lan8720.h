@@ -16,7 +16,7 @@
 ////////////////////////////////////////////////////////////////////////////////// 
 
 
-#define LAN8720_PHY_ADDRESS  	0x00				//LAN8720 PHY芯片地址.
+#define LAN8720_PHY_ADDRESS  	0x01				//LAN8720 PHY芯片地址.
 #define LAN8720_RST 		   	PDout(3) 			//LAN8720复位引脚	 
 
 extern ETH_DMADESCTypeDef *DMARxDscrTab;			//以太网DMA接收描述符数据结构体指针

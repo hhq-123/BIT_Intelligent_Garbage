@@ -39,7 +39,7 @@
 ..\obj\main.o: ..\SYSTEM\usart\usart.h
 ..\obj\main.o: D:\Program Files\IDE\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 ..\obj\main.o: ..\HARDWARE\TIMER\timer.h
-..\obj\main.o: ..\INTERFACE\MR_TASK\MR_task.h
+..\obj\main.o: ..\INTERFACE\BIG_TASK\BIG_task.h
 ..\obj\main.o: ..\FreeRTOS\include\FreeRTOS.h
 ..\obj\main.o: D:\Program Files\IDE\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 ..\obj\main.o: ..\FreeRTOS\include\FreeRTOSConfig.h
@@ -56,9 +56,14 @@
 ..\obj\main.o: ..\HARDWARE\LCD\lcd.h
 ..\obj\main.o: D:\Program Files\IDE\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 ..\obj\main.o: ..\HARDWARE\USART2\usart2.h
+..\obj\main.o: ..\HARDWARE\SRAM\sram.h
 ..\obj\main.o: ..\HARDWARE\OV2640\ov2640.h
 ..\obj\main.o: ..\HARDWARE\OV2640\sccb.h
 ..\obj\main.o: ..\HARDWARE\DCMI\dcmi.h
-..\obj\main.o: ..\LWIP\arch\sys_eth.h
-..\obj\main.o: ..\LWIP\lwip_app\tcp_client\tcp_client.h
-..\obj\main.o: ..\INTERFACE\MR_CV\MR_CV.h
+..\obj\main.o: ..\LWIP\lwip_app\lwip_comm\lwip_comm.h
+..\obj\main.o: ..\HARDWARE\ETHERNET\lan8720.h
+..\obj\main.o: ..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth.h
+..\obj\main.o: ..\FWLIB\STM32F4x7_ETH_Driver\inc\stm32f4x7_eth_conf.h
+..\obj\main.o: ..\LWIP\arch\lwipopts.h
+..\obj\main.o: ..\INTERFACE\BIG_IT\BIG_ImageTransmission.h
+..\obj\main.o: ..\MALLOC\malloc.h

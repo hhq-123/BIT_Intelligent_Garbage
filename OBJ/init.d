@@ -59,7 +59,7 @@
 ..\obj\init.o: ..\LWIP\lwip-1.4.1\src\include\lwip/mem.h
 ..\obj\init.o: ..\LWIP\lwip-1.4.1\src\include\lwip/memp.h
 ..\obj\init.o: ..\LWIP\lwip-1.4.1\src\include\lwip/memp_std.h
-..\obj\init.o: ..\LWIP\lwip-1.4.1\src\include\lwip/sys.h
+..\obj\init.o: ..\LWIP\lwip-1.4.1\src\include\lwip/lwip_sys.h
 ..\obj\init.o: ..\LWIP\lwip-1.4.1\src\include\lwip/err.h
 ..\obj\init.o: ..\LWIP\arch/sys_arch.h
 ..\obj\init.o: ..\FreeRTOS\include\semphr.h

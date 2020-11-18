@@ -56,7 +56,7 @@
 ..\obj\timers.o: ..\LWIP\lwip-1.4.1\src\include\lwip/opt.h
 ..\obj\timers.o: ..\LWIP\lwip-1.4.1\src\include\lwip/timers.h
 ..\obj\timers.o: ..\LWIP\lwip-1.4.1\src\include\lwip/err.h
-..\obj\timers.o: ..\LWIP\lwip-1.4.1\src\include\lwip/sys.h
+..\obj\timers.o: ..\LWIP\lwip-1.4.1\src\include\lwip/lwip_sys.h
 ..\obj\timers.o: ..\LWIP\arch/sys_arch.h
 ..\obj\timers.o: ..\FreeRTOS\include\semphr.h
 ..\obj\timers.o: ..\FreeRTOS\include\queue.h

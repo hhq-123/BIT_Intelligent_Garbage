@@ -4,8 +4,8 @@
 
 #include "timer.h"
 
-#include "MR_task.h"
-
+#include "BIG_task.h"
+#include "malloc.h"
 
 /************************************************
  ALIENTEK 探索者STM32F407开发板 FreeRTOS实验6-1
@@ -26,7 +26,13 @@ int main(void)
 	usart2_init(42,115200);		//初始化串口2波特率为115200
 	LED_Init();		        			//初始化LED端口
 	LCD_Init();							//初始化LCD
- 	KEY_Init();					//按键初始化 
+	FSMC_SRAM_Init();			//初始化外部SRAM.
+ 	
+	my_mem_init(SRAMIN);    //初始化内部内存池
+	my_mem_init(SRAMEX);  	//初始化外部内存池
+//	mymem_init(SRAMCCM); 	//初始化CCM内存池
+	
+	KEY_Init();					//按键初始化 
 	/*
 	POINT_COLOR = RED;
 	LCD_ShowString(30,10,200,16,16,"ATK STM32F103/F407");	
@@ -35,7 +41,16 @@ int main(void)
 	LCD_ShowString(30,70,200,16,16,"ATOM@ALIENTEK");
 	LCD_ShowString(30,90,200,16,16,"2016/11/25");
 	*/
-	MR_start();
+	while(lwip_comm_init()) 	//lwip初始化
+	{
+		LCD_ShowString(30,110,200,20,16,"Lwip Init failed!"); 	//lwip初始化失败
+		delay_ms(500);
+		LCD_Fill(30,110,230,150,WHITE);
+		delay_ms(500);
+	}
+	LCD_ShowString(30,110,200,20,16,"Lwip Init Success!"); 		//lwip初始化成功
+	
+	BIG_start();
 }
 
 

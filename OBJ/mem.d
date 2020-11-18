@@ -56,7 +56,7 @@
 ..\obj\mem.o: ..\LWIP\lwip-1.4.1\src\include\lwip/opt.h
 ..\obj\mem.o: ..\LWIP\lwip-1.4.1\src\include\lwip/def.h
 ..\obj\mem.o: ..\LWIP\lwip-1.4.1\src\include\lwip/mem.h
-..\obj\mem.o: ..\LWIP\lwip-1.4.1\src\include\lwip/sys.h
+..\obj\mem.o: ..\LWIP\lwip-1.4.1\src\include\lwip/lwip_sys.h
 ..\obj\mem.o: ..\LWIP\lwip-1.4.1\src\include\lwip/err.h
 ..\obj\mem.o: ..\LWIP\arch/sys_arch.h
 ..\obj\mem.o: ..\FreeRTOS\include\semphr.h

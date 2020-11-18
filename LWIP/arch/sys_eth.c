@@ -515,16 +515,16 @@ unsigned int eth_default_ip_get(sLwipDev_t * const psLwipDev)
  
    psLwipDev->localip[0] = 192;
    psLwipDev->localip[1] = 168;
-   psLwipDev->localip[2] = 1;
-   psLwipDev->localip[3] = 100;
+   psLwipDev->localip[2] = 0;
+   psLwipDev->localip[3] = 10;
  
-   psLwipDev->remoteip[0] = 192;
-   psLwipDev->remoteip[1] = 168;
-   psLwipDev->remoteip[2] = 1;
-   psLwipDev->remoteip[3] = 10;
+   psLwipDev->remoteip[0] = 169;
+   psLwipDev->remoteip[1] = 254;
+   psLwipDev->remoteip[2] = 174;
+   psLwipDev->remoteip[3] = 92;
  
-   psLwipDev->localport = 8088;
-   psLwipDev->remoteport = 8086;
+   psLwipDev->localport = 80;
+   psLwipDev->remoteport = 80;
    return 0;
 }
  

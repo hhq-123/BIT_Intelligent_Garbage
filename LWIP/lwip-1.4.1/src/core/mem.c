@@ -59,7 +59,7 @@
 
 #include "lwip/def.h"
 #include "lwip/mem.h"
-#include "lwip/sys.h"
+#include "lwip/lwip_sys.h"
 #include "lwip/stats.h"
 #include "lwip/err.h"
 
@@ -179,7 +179,8 @@ struct mem {
  * how that space is calculated). */
 #ifndef LWIP_RAM_HEAP_POINTER
 /** the heap. we need one struct mem at the end and some room for alignment */
-u8_t ram_heap[MEM_SIZE_ALIGNED + (2*SIZEOF_STRUCT_MEM) + MEM_ALIGNMENT];
+//u8_t ram_heap[MEM_SIZE_ALIGNED + (2*SIZEOF_STRUCT_MEM) + MEM_ALIGNMENT];
+u8_t *ram_heap;	//ram_heap采用ALIENTEK进行分配,分配过程在mem_init中
 #define LWIP_RAM_HEAP_POINTER ram_heap
 #endif /* LWIP_RAM_HEAP_POINTER */
 

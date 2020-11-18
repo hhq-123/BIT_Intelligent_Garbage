@@ -62,7 +62,7 @@
 ..\obj\sockets.o: ..\LWIP\lwip-1.4.1\src\include\lwip/netbuf.h
 ..\obj\sockets.o: ..\LWIP\lwip-1.4.1\src\include\lwip/pbuf.h
 ..\obj\sockets.o: ..\LWIP\lwip-1.4.1\src\include\lwip/err.h
-..\obj\sockets.o: ..\LWIP\lwip-1.4.1\src\include\lwip/sys.h
+..\obj\sockets.o: ..\LWIP\lwip-1.4.1\src\include\lwip/lwip_sys.h
 ..\obj\sockets.o: ..\LWIP\arch/sys_arch.h
 ..\obj\sockets.o: ..\FreeRTOS\include\semphr.h
 ..\obj\sockets.o: ..\FreeRTOS\include\queue.h

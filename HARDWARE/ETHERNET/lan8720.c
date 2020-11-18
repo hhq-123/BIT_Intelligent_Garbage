@@ -3,6 +3,8 @@
 #include "usart.h" 
 #include "delay.h"
 #include "malloc.h" 
+#include "FreeRTOS.h"
+//#include "malloc.h" 
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F407开发板
@@ -244,10 +246,19 @@ u32 ETH_GetCurrentTxBuffer(void)
 //    其他,失败
 u8 ETH_Mem_Malloc(void)
 { 
+	int freemem;
+//	DMARxDscrTab=pvPortMalloc(ETH_RXBUFNB*sizeof(ETH_DMADESCTypeDef));//申请内存
+//	DMATxDscrTab=pvPortMalloc(ETH_TXBUFNB*sizeof(ETH_DMADESCTypeDef));//申请内存  
+//	Rx_Buff=pvPortMalloc(ETH_RX_BUF_SIZE*ETH_RXBUFNB);	//申请内存
+//	Tx_Buff=pvPortMalloc(ETH_TX_BUF_SIZE*ETH_TXBUFNB);	//申请内存
+	
 	DMARxDscrTab=mymalloc(SRAMIN,ETH_RXBUFNB*sizeof(ETH_DMADESCTypeDef));//申请内存
 	DMATxDscrTab=mymalloc(SRAMIN,ETH_TXBUFNB*sizeof(ETH_DMADESCTypeDef));//申请内存  
 	Rx_Buff=mymalloc(SRAMIN,ETH_RX_BUF_SIZE*ETH_RXBUFNB);	//申请内存
 	Tx_Buff=mymalloc(SRAMIN,ETH_TX_BUF_SIZE*ETH_TXBUFNB);	//申请内存
+	
+	freemem = xPortGetFreeHeapSize();
+	//printf("freemem = %d %d %d %d %d", freemem, DMARxDscrTab,DMATxDscrTab,Rx_Buff, Tx_Buff);
 	if(!DMARxDscrTab||!DMATxDscrTab||!Rx_Buff||!Tx_Buff)
 	{
 		ETH_Mem_Free();

@@ -1,6 +1,23 @@
+//#include "lwip_comm.h" 
+//#include "ethernetif.h" 
+//#include "netif/etharp.h"
+//#include "lwip/dhcp.h"
+//#include "lwip/timers.h"
+//#include "lwip/memp.h" 
+//#include "lwip/tcp_impl.h"
+//#include "lwip/ip_frag.h"
+//#include "lwip/tcpip.h" 
+//#include "malloc.h"
+//#include "delay.h"
+//#include "usart.h"  
+//#include <stdio.h>
+
 #include "lwip_comm.h" 
 #include "netif/etharp.h"
 #include "lwip/dhcp.h"
+#include "lwip/mem.h"
+#include "lwip/memp.h"
+#include "lwip/init.h"
 #include "ethernetif.h" 
 #include "lwip/timers.h"
 #include "lwip/tcp_impl.h"
@@ -10,7 +27,7 @@
 #include "delay.h"
 #include "usart.h"  
 #include <stdio.h>
-#include "ucos_ii.h" 
+
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F407开发板
@@ -39,6 +56,7 @@ extern u8_t *ram_heap;					//在mem.c里面定义.
 /////////////////////////////////////////////////////////////////////////////////
 //lwip两个任务定义(内核任务和DHCP任务)
 
+/*
 //lwip内核任务堆栈(优先级和堆栈大小在lwipopts.h定义了) 
 OS_STK * TCPIP_THREAD_TASK_STK;	 
 
@@ -50,7 +68,19 @@ OS_STK * TCPIP_THREAD_TASK_STK;
 //任务堆栈，采用内存管理的方式控制申请	
 OS_STK * LWIP_DHCP_TASK_STK;	
 //任务函数
-void lwip_dhcp_task(void *pdata); 
+void lwip_dhcp_task(void *pdata);
+*/
+
+//任务优先级
+#define LWIP_DHCP_TASK_PRIO		7
+//任务堆栈大小	
+#define LWIP_DHCP_STK_SIZE 		128  
+//任务句柄
+TaskHandle_t LwipDhcpTask_Handler;
+//任务函数
+void lwip_dhcp_task(void *pvParameters);
+
+
 
 
 //用于以太网中断调用
@@ -58,6 +88,7 @@ void lwip_pkt_handle(void)
 {
 	ethernetif_input(&lwip_netif);
 }
+
 //lwip内核部分,内存申请
 //返回值:0,成功;
 //    其他,失败
@@ -65,26 +96,28 @@ u8 lwip_comm_mem_malloc(void)
 {
 	u32 mempsize;
 	u32 ramheapsize; 
-	mempsize=memp_get_memorysize();			//得到memp_memory数组大小
-	memp_memory=mymalloc(SRAMIN,mempsize);	//为memp_memory申请内存
-	ramheapsize=LWIP_MEM_ALIGN_SIZE(MEM_SIZE)+2*LWIP_MEM_ALIGN_SIZE(4*3)+MEM_ALIGNMENT;//得到ram heap大小
-	ram_heap=mymalloc(SRAMIN,ramheapsize);	//为ram_heap申请内存 
-	TCPIP_THREAD_TASK_STK=mymalloc(SRAMIN,TCPIP_THREAD_STACKSIZE*4);//给内核任务申请堆栈 
-	LWIP_DHCP_TASK_STK=mymalloc(SRAMIN,LWIP_DHCP_STK_SIZE*4);		//给dhcp任务堆栈申请内存空间
-	if(!memp_memory||!ram_heap||!TCPIP_THREAD_TASK_STK||!LWIP_DHCP_TASK_STK)//有申请失败的
+	mempsize = memp_get_memorysize();			//得到memp_memory数组大小
+	memp_memory = mymalloc(SRAMIN,mempsize);	//为memp_memory申请内存
+	ramheapsize = LWIP_MEM_ALIGN_SIZE(MEM_SIZE)+2*LWIP_MEM_ALIGN_SIZE(4*3)+MEM_ALIGNMENT;//得到ram heap大小
+	ram_heap = mymalloc(SRAMIN,ramheapsize);	//为ram_heap申请内存 
+	
+	
+//	TCPIP_THREAD_TASK_STK=mymalloc(SRAMIN,TCPIP_THREAD_STACKSIZE*4);//给内核任务申请堆栈 
+//	LWIP_DHCP_TASK_STK=mymalloc(SRAMIN,LWIP_DHCP_STK_SIZE*4);		//给dhcp任务堆栈申请内存空间
+	if(!memp_memory||!ram_heap)//有申请失败的||!TCPIP_THREAD_TASK_STK||!LWIP_DHCP_TASK_STK
 	{
 		lwip_comm_mem_free();
 		return 1;
 	}
 	return 0;	
 }
+
 //lwip内核部分,内存释放
 void lwip_comm_mem_free(void)
 { 	
 	myfree(SRAMIN,memp_memory);
 	myfree(SRAMIN,ram_heap);
-	myfree(SRAMIN,TCPIP_THREAD_TASK_STK);
-	myfree(SRAMIN,LWIP_DHCP_TASK_STK);
+
 }
 //lwip 默认IP设置
 //lwipx:lwip控制结构体指针
@@ -129,14 +162,26 @@ void lwip_comm_default_ip_set(__lwip_dev *lwipx)
 //      3,网卡添加失败.
 u8 lwip_comm_init(void)
 {
-	OS_CPU_SR cpu_sr;
+	//OS_CPU_SR cpu_sr;
 	struct netif *Netif_Init_Flag;		//调用netif_add()函数时的返回值,用于判断网络初始化是否成功
 	struct ip_addr ipaddr;  			//ip地址
 	struct ip_addr netmask; 			//子网掩码
 	struct ip_addr gw;      			//默认网关 
-	if(ETH_Mem_Malloc())return 1;		//内存申请失败
-	if(lwip_comm_mem_malloc())return 1;	//内存申请失败
-	if(LAN8720_Init())return 2;			//初始化LAN8720失败 
+	if(ETH_Mem_Malloc())
+	{
+		printf("ETH_Mem_Malloc内存申请失败");
+		return 1;		//内存申请失败
+	}
+	if(lwip_comm_mem_malloc())
+	{
+		printf("lwip_comm_mem_malloc内存申请失败");
+		return 1;	//内存申请失败
+	}
+	if(LAN8720_Init())
+	{
+		printf("初始化LAN8720失败 ");
+		return 2;			//初始化LAN8720失败 
+	}
 	tcpip_init(NULL,NULL);				//初始化tcp ip内核,该函数里面会创建tcpip_thread内核任务
 	lwip_comm_default_ip_set(&lwipdev);	//设置默认IP等信息
 #if LWIP_DHCP		//使用动态IP
@@ -152,9 +197,10 @@ u8 lwip_comm_init(void)
 	printf("子网掩码..........................%d.%d.%d.%d\r\n",lwipdev.netmask[0],lwipdev.netmask[1],lwipdev.netmask[2],lwipdev.netmask[3]);
 	printf("默认网关..........................%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
 #endif
-	OS_ENTER_CRITICAL();  //进入临界区
+	taskENTER_CRITICAL();//OS_ENTER_CRITICAL();  //进入临界区
 	Netif_Init_Flag=netif_add(&lwip_netif,&ipaddr,&netmask,&gw,NULL,&ethernetif_init,&tcpip_input);//向网卡列表中添加一个网口
-	OS_EXIT_CRITICAL();  //退出临界区
+	taskEXIT_CRITICAL(); //OS_EXIT_CRITICAL();  //退出临界区
+	
 	if(Netif_Init_Flag==NULL)return 3;//网卡添加失败 
 	else//网口添加成功后,设置netif为默认值,并且打开netif网口
 	{
@@ -168,17 +214,27 @@ u8 lwip_comm_init(void)
 //创建DHCP任务
 void lwip_comm_dhcp_creat(void)
 {
-	OS_CPU_SR cpu_sr;
-	OS_ENTER_CRITICAL();  //进入临界区
-	OSTaskCreate(lwip_dhcp_task,(void*)0,(OS_STK*)&LWIP_DHCP_TASK_STK[LWIP_DHCP_STK_SIZE-1],LWIP_DHCP_TASK_PRIO);//创建DHCP任务 
-	OS_EXIT_CRITICAL();  //退出临界区
+	//OS_CPU_SR cpu_sr;
+	taskENTER_CRITICAL();  //进入临界区
+
+	xTaskCreate((TaskFunction_t )lwip_dhcp_task,             
+                (const char*    )"lwip_dhcp_task",           
+                (uint16_t       )LWIP_DHCP_STK_SIZE,        
+                (void*          )NULL,                  
+                (UBaseType_t    )LWIP_DHCP_TASK_PRIO,        
+                (TaskHandle_t*  )&LwipDhcpTask_Handler);  		
+	
+	
+	taskEXIT_CRITICAL();  //退出临界区
 }
+
 //删除DHCP任务
 void lwip_comm_dhcp_delete(void)
 {
 	dhcp_stop(&lwip_netif); 		//关闭DHCP
-	OSTaskDel(LWIP_DHCP_TASK_PRIO);	//删除DHCP任务
+	vTaskDelete(LwipDhcpTask_Handler);	//删除DHCP任务
 }
+
 //DHCP处理任务
 void lwip_dhcp_task(void *pdata)
 {
