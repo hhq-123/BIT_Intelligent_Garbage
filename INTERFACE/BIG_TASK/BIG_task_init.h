@@ -57,7 +57,7 @@ TaskHandle_t Rgb565TestTask_Handler;
 void rgb565_test_task(void *pvParameters);
 
 //任务优先级
-#define TCP_CLIENT_TASK_PRIO		2
+#define TCP_CLIENT_TASK_PRIO		3
 //任务堆栈大小	
 #define TCP_CLIENT_STK_SIZE 		128  
 //任务句柄
@@ -66,12 +66,21 @@ TaskHandle_t TcpClientTask_Handler;
 void tcp_client_task(void *pvParameters);
 
 //任务优先级
-#define SINGLE_IMAGE_TRANSFER_TASK_PRIO		2
+#define SINGLE_IMAGE_TRANSFER_TASK_PRIO		3
 //任务堆栈大小	
 #define SINGLE_IMAGE_TRANSFER_STK_SIZE 		128  
 //任务句柄
 TaskHandle_t SingleImageTransfer_Handler;
 //任务函数
 void single_image_transfer_task(void *pvParameters);
+
+//任务优先级
+#define IMAGE_TRANSMISSION_TASK_PRIO		3
+//任务堆栈大小	
+#define IMAGE_TRANSMISSION_STK_SIZE 		128  
+//任务句柄
+TaskHandle_t ImageTransmission_Handler;
+//任务函数
+void image_transmisson_task(void *pvParameters);
 
 #endif

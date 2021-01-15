@@ -40,7 +40,6 @@ void tcp_client_set_remoteip(void)
 {
 	u8 *tbuf;
 	u16 xoff;
-	u8 key;
 	LCD_Clear(WHITE);
 	POINT_COLOR=RED;
 	LCD_ShowString(30,30,200,16,16,"Explorer STM32F4");
@@ -163,6 +162,7 @@ void tcp_client_test(void)
 	tcp_client_connection_close(tcppcb,0);//关闭TCP Client连接
 	myfree(SRAMIN,tbuf);
 } 
+
 //lwIP TCP连接建立后调用回调函数
 err_t tcp_client_connected(void *arg, struct tcp_pcb *tpcb, err_t err)
 {
@@ -280,6 +280,7 @@ err_t tcp_client_sent(void *arg, struct tcp_pcb *tpcb, u16_t len)
 	if(es->p)tcp_client_senddata(tpcb,es);//发送数据
 	return ERR_OK;
 }
+
 //此函数用来发送数据
 void tcp_client_senddata(struct tcp_pcb *tpcb, struct tcp_client_struct * es)
 {
@@ -298,6 +299,7 @@ void tcp_client_senddata(struct tcp_pcb *tpcb, struct tcp_client_struct * es)
 		tcp_output(tpcb);		//将发送缓冲队列中的数据立即发送出去
 	} 
 } 
+
 //关闭与服务器的连接
 void tcp_client_connection_close(struct tcp_pcb *tpcb, struct tcp_client_struct * es)
 {

@@ -1,17 +1,3 @@
-//#include "lwip_comm.h" 
-//#include "ethernetif.h" 
-//#include "netif/etharp.h"
-//#include "lwip/dhcp.h"
-//#include "lwip/timers.h"
-//#include "lwip/memp.h" 
-//#include "lwip/tcp_impl.h"
-//#include "lwip/ip_frag.h"
-//#include "lwip/tcpip.h" 
-//#include "malloc.h"
-//#include "delay.h"
-//#include "usart.h"  
-//#include <stdio.h>
-
 #include "lwip_comm.h" 
 #include "netif/etharp.h"
 #include "lwip/dhcp.h"
@@ -52,6 +38,14 @@ extern u32 memp_get_memorysize(void);	//在memp.c里面定义
 extern u8_t *memp_memory;				//在memp.c里面定义.
 extern u8_t *ram_heap;					//在mem.c里面定义.
 
+u32 TCPTimer=0;			//TCP查询计时器
+u32 ARPTimer=0;			//ARP查询计时器
+u32 lwip_localtime;		//lwip本地时间计数器,单位:ms
+
+#if LWIP_DHCP
+u32 DHCPfineTimer=0;	//DHCP精细处理计时器
+u32 DHCPcoarseTimer=0;	//DHCP粗糙处理计时器
+#endif
 
 /////////////////////////////////////////////////////////////////////////////////
 //lwip两个任务定义(内核任务和DHCP任务)
@@ -70,7 +64,7 @@ OS_STK * LWIP_DHCP_TASK_STK;
 //任务函数
 void lwip_dhcp_task(void *pdata);
 */
-
+/*************************lwip_dhcp_task*************************/
 //任务优先级
 #define LWIP_DHCP_TASK_PRIO		7
 //任务堆栈大小	
@@ -79,7 +73,18 @@ void lwip_dhcp_task(void *pdata);
 TaskHandle_t LwipDhcpTask_Handler;
 //任务函数
 void lwip_dhcp_task(void *pvParameters);
+/*************************lwip_dhcp_task*************************/
 
+/*************************lwip_periodic_task*************************/
+//任务优先级
+#define LWIP_PERIODIC_TASK_PRIO		2
+//任务堆栈大小	
+#define LWIP_PERIODIC_STK_SIZE 		256  
+//任务句柄
+TaskHandle_t LwipPeriodicTask_Handler;
+//任务函数
+void lwip_periodic_task(void *pvParameters);
+/*************************lwip_periodic_task*************************/
 
 
 
@@ -129,7 +134,7 @@ void lwip_comm_default_ip_set(__lwip_dev *lwipx)
 	lwipx->remoteip[0]=192;	
 	lwipx->remoteip[1]=168;
 	lwipx->remoteip[2]=1;
-	lwipx->remoteip[3]=11;
+	lwipx->remoteip[3]=100;
 	//MAC地址设置(高三字节固定为:2.0.0,低三字节用STM32唯一ID)
 	lwipx->mac[0]=2;//高三字节(IEEE称之为组织唯一ID,OUI)地址固定为:2.0.0
 	lwipx->mac[1]=0;
@@ -169,19 +174,22 @@ u8 lwip_comm_init(void)
 	struct ip_addr gw;      			//默认网关 
 	if(ETH_Mem_Malloc())
 	{
-		printf("ETH_Mem_Malloc内存申请失败");
+		printf("ETH_Mem_Malloc内存申请失败\r\n");
 		return 1;		//内存申请失败
 	}
+	printf("ETH_Mem_Malloc内存申请成功\r\n");
 	if(lwip_comm_mem_malloc())
 	{
-		printf("lwip_comm_mem_malloc内存申请失败");
+		printf("lwip_comm_mem_malloc内存申请失败\r\n");
 		return 1;	//内存申请失败
 	}
+	printf("lwip_comm_mem_malloc内存申请成功\r\n");
 	if(LAN8720_Init())
 	{
-		printf("初始化LAN8720失败 ");
+		printf("初始化LAN8720失败\r\n");
 		return 2;			//初始化LAN8720失败 
 	}
+	printf("初始化LAN8720成功\r\n");
 	tcpip_init(NULL,NULL);				//初始化tcp ip内核,该函数里面会创建tcpip_thread内核任务
 	lwip_comm_default_ip_set(&lwipdev);	//设置默认IP等信息
 #if LWIP_DHCP		//使用动态IP
@@ -209,14 +217,21 @@ u8 lwip_comm_init(void)
 	}
 	return 0;//操作OK.
 }   
+
+
+
+
+
+/*************************lwip_dhcp_task*************************/
 //如果使能了DHCP
 #if LWIP_DHCP
+
 //创建DHCP任务
-void lwip_comm_dhcp_creat(void)
+void lwip_comm_dhcp_create(void)
 {
 	//OS_CPU_SR cpu_sr;
 	taskENTER_CRITICAL();  //进入临界区
-
+	printf("创建DHCP任务");
 	xTaskCreate((TaskFunction_t )lwip_dhcp_task,             
                 (const char*    )"lwip_dhcp_task",           
                 (uint16_t       )LWIP_DHCP_STK_SIZE,        
@@ -224,7 +239,7 @@ void lwip_comm_dhcp_creat(void)
                 (UBaseType_t    )LWIP_DHCP_TASK_PRIO,        
                 (TaskHandle_t*  )&LwipDhcpTask_Handler);  		
 	
-	
+
 	taskEXIT_CRITICAL();  //退出临界区
 }
 
@@ -236,15 +251,16 @@ void lwip_comm_dhcp_delete(void)
 }
 
 //DHCP处理任务
-void lwip_dhcp_task(void *pdata)
+void lwip_dhcp_task(void *pvParameters)
 {
+	printf("创建DHCP任务成功");
 	u32 ip=0,netmask=0,gw=0;
 	dhcp_start(&lwip_netif);//开启DHCP 
 	lwipdev.dhcpstatus=0;	//正在DHCP
 	printf("正在查找DHCP服务器,请稍等...........\r\n");   
 	while(1)
 	{ 
-		printf("正在获取地址...\r\n");
+		//printf("正在获取地址...\r\n");
 		ip=lwip_netif.ip_addr.addr;		//读取新IP地址
 		netmask=lwip_netif.netmask.addr;//读取子网掩码
 		gw=lwip_netif.gw.addr;			//读取默认网关 
@@ -285,16 +301,84 @@ void lwip_dhcp_task(void *pdata)
 			printf("默认网关..........................%d.%d.%d.%d\r\n",lwipdev.gateway[0],lwipdev.gateway[1],lwipdev.gateway[2],lwipdev.gateway[3]);
 			break;
 		}  
-		delay_ms(250); //延时250ms
+		vTaskDelay(250); //延时250ms
 	}
 	lwip_comm_dhcp_delete();//删除DHCP任务 
 }
-#endif 
+#endif
+/*************************lwip_dhcp_task*************************/
 
 
+/*************************lwip_periodic_task*************************/
+//如果使能了DHCP
+#if LWIP_TCP
 
+////创建LWIP轮询任务
+//void lwip_periodic_create(void)
+//{
+//	//OS_CPU_SR cpu_sr;
+//	printf("12345678\r\n");
+//	taskENTER_CRITICAL();  //进入临界区
+//	
+//	xTaskCreate((TaskFunction_t )lwip_periodic_task,             
+//                (const char*    )"lwip_periodic_task",           
+//                (uint16_t       )LWIP_PERIODIC_STK_SIZE,        
+//                (void*          )NULL,                  
+//                (UBaseType_t    )LWIP_PERIODIC_TASK_PRIO,        
+//                (TaskHandle_t*  )&LwipPeriodicTask_Handler);  		
+//	
+//	taskEXIT_CRITICAL();  //退出临界区
+//}
 
+////删除LWIP轮询任务
+//void lwip_periodic_delete(void)
+//{
 
+//	vTaskDelete(LwipPeriodicTask_Handler);	//删除LWIP轮询任务
+//}
+
+//LWIP轮询任务
+void lwip_periodic_handle()
+{
+	lwip_localtime = sys_now();
+#if LWIP_TCP
+	//每250ms调用一次tcp_tmr()函数
+  if (lwip_localtime - TCPTimer >= TCP_TMR_INTERVAL)
+  {
+    TCPTimer =  lwip_localtime;
+    tcp_tmr();
+  }
+#endif
+  //ARP每5s周期性调用一次
+  if ((lwip_localtime - ARPTimer) >= ARP_TMR_INTERVAL)
+  {
+    ARPTimer =  lwip_localtime;
+    etharp_tmr();
+  }
+
+#if LWIP_DHCP //如果使用DHCP的话
+  //每500ms调用一次dhcp_fine_tmr()
+  if (lwip_localtime - DHCPfineTimer >= DHCP_FINE_TIMER_MSECS)
+  {
+    DHCPfineTimer =  lwip_localtime;
+    dhcp_fine_tmr();
+    if ((lwipdev.dhcpstatus != 2)&&(lwipdev.dhcpstatus != 0XFF))
+    { 
+      lwip_comm_dhcp_create();  //DHCP处理
+    }
+  }
+
+  //每60s执行一次DHCP粗糙处理
+  if (lwip_localtime - DHCPcoarseTimer >= DHCP_COARSE_TIMER_MSECS)
+  {
+    DHCPcoarseTimer =  lwip_localtime;
+    dhcp_coarse_tmr();
+  }  
+#endif
+}
+
+#endif
+/*************************lwip_periodic_task*************************/
 
 
 

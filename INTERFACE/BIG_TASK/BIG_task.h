@@ -21,6 +21,7 @@
 #include "dcmi.h" 
 
 #include "lwip_comm.h"
+#include "tcp_client_demo.h"
 #include "LAN8720.h"
 #include "lwipopts.h"
 

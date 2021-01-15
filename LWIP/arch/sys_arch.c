@@ -39,6 +39,11 @@
 #include "lwip/mem.h"
 #include "sys_arch.h"
 
+#include "timer.h"
+
+//为LWIP提供计时
+extern uint32_t lwip_localtime;//lwip本地时间计数器,单位:ms
+
 
 const u32_t NullValue; // 定义一个常量值，用于空指针
  

@@ -61,3 +61,4 @@
 ..\obj\sys_arch.o: ..\FreeRTOS\include\semphr.h
 ..\obj\sys_arch.o: ..\FreeRTOS\include\queue.h
 ..\obj\sys_arch.o: ..\LWIP\lwip-1.4.1\src\include\lwip/mem.h
+..\obj\sys_arch.o: ..\HARDWARE\TIMER\timer.h
